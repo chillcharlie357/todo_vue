@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 
 const props = defineProps(['todos']);
+const emit = defineEmits(['update:todos']);
 
 const isModalVisible = ref(false);
 const currentTodo = ref();
@@ -16,18 +17,20 @@ const handleEditTodo = (todo) => {
   isModalVisible.value = true;
 };
 
-const emit = defineEmits(['update:todos']);
 const handleOk = () => {
   const updatedTodos = [...props.todos];
   const index = updatedTodos.findIndex(todo => todo.id === currentTodo.value.id);
   if (index !== -1) {
     // Update existing todo
     updatedTodos[index] = { ...currentTodo.value };
+    console.log('Update todo:', currentTodo.value);
   } else {
     // Add new todo
     updatedTodos.push({ ...currentTodo.value });
+    console.log('Add todo:', currentTodo.value);
   }
   emit('update:todos', updatedTodos);
+  console.log('Updated todos:', updatedTodos);
   isModalVisible.value = false;
 };
 
@@ -43,8 +46,6 @@ const handleAddTodo = () => {
     priority: '中',
     remark: '',
   }
-  console.log('todos:', props.todos);
-  console.log('Add todo:', currentTodo.value);
   modelTitle.value = '添加待办事项';
   isModalVisible.value = true;
 };

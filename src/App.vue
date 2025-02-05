@@ -1,36 +1,30 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import TodoList from './components/TodoList.vue';
 import dayjs from 'dayjs';
 
-const todos = ref ([
-  {
-    id: 1,
-    title: '完成项目报告',
-    dueDate: dayjs('2023-10-10'),
-    priority: '高',
-    remark: '需要包含所有最新数据',
-  },
-  {
-    id: 2,
-    title: '团队会议',
-    dueDate: dayjs('2023-10-10'),
-    priority: '中',
-    remark: '讨论项目进展',
-    finished: false,
-  },
-  {
-    id: 3,
-    title: '代码审查',
-    dueDate: dayjs('2023-10-12'),
-    priority: '低',
-    remark: '检查新功能代码',
-    finished: false,
-  },
-]);
+// 从 localStorage 加载 todos
+const loadTodos = () => {
+  const savedTodos = localStorage.getItem('todos');
+  const parsedTodos = savedTodos ? JSON.parse(savedTodos) : [];
+  parsedTodos.forEach(todo => {
+    todo.dueDate = dayjs(todo.dueDate);
+  });
+  return parsedTodos;
+};
+
+const todos = ref(loadTodos());
+
+// 监听 todos 的变化，并保存到 localStorage
+watch(todos, (newTodos) => {
+  console.log('Save todos:', newTodos);
+  localStorage.setItem('todos', JSON.stringify(newTodos));
+}, { deep: true });
 
 const updateTodos = (updatedTodos) => {
+  console.log('Update todos:', updatedTodos);
   todos.value = updatedTodos;
+  console.log('Current todos:', todos.value);
 };
 
 </script>
