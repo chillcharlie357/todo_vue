@@ -11,8 +11,11 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "ant-design-vue": "^4.2.6",
+    "dayjs": "^1.11.13",
     "pinia": "^2.3.1",
     "todo": "file:",
+    "uuid": "^11.0.5",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
