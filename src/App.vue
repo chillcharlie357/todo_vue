@@ -30,5 +30,14 @@ const updateTodos = (updatedTodos) => {
 </script>
 
 <template>
-  <TodoList :todos="todos"  @update:todos="updateTodos"/>
+  <TodoList :todos="todos"  @update:todos="updateTodos" class="container"/>
 </template>
+
+<style>
+.class {
+  margin: 0 auto;
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+}
+</style>

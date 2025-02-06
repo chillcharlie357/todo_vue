@@ -1,9 +1,10 @@
 <script setup>
 import { ref } from 'vue';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons-vue';
+import { EditOutlined, DeleteOutlined , PlusOutlined} from '@ant-design/icons-vue';
 import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 import {marked} from 'marked';
+import { message } from 'ant-design-vue';
 
 const props = defineProps(['todos']);
 const emit = defineEmits(['update:todos']);
@@ -61,6 +62,33 @@ const renderedMarkdown = (markdown) => {
   return marked(markdown || '');
 };
 
+const handleBeforeUpload = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = () => {
+      if (!currentTodo.value.imgs) {
+        currentTodo.value.imgs = [];
+      }
+      currentTodo.value.imgs.push(reader.result);
+      // 取消默认上传行为
+      resolve(false);
+    };
+    reader.onerror = () => {
+      message.error('Failed to read file:', file);
+      reject();
+    };
+  });
+};
+
+// 删除图片
+const removeImage = (index) => {
+  if (currentTodo.value && currentTodo.value.imgs) {
+    currentTodo.value.imgs.splice(index, 1);
+  }
+};
+
 </script>
 
 <template>
@@ -76,7 +104,10 @@ const renderedMarkdown = (markdown) => {
           <div class="card-content">
             <p><strong>到期时间:</strong> {{ dayjs(todo.dueDate).format("YYYY-MM-DD") }}</p>
             <p><strong>优先级:</strong> {{ todo.priority }}</p>
-            <p><strong>备注:</strong> </p>
+            <p v-if="todo.imgs"><strong>图片:</strong>
+              <img class="image-preview-card" v-for="img in todo.imgs" :src="img" :key="img"/>
+            </p>
+            <p v-if="todo.remark"><strong>备注:</strong> </p>
             <div v-html="renderedMarkdown(todo.remark)"></div>
           </div>
 
@@ -89,7 +120,14 @@ const renderedMarkdown = (markdown) => {
       </a-col>
     </a-row>
 
-    <a-modal v-model:open="isModalVisible" :title="modelTitle" @ok="handleOk" @cancel="handleCancel">
+    <a-modal class="modal"
+      v-model:open="isModalVisible"
+      :title="modelTitle"
+      ok-text="确认"
+      cancel-text="取消"
+      width="90%"
+      @ok="handleOk"
+      @cancel="handleCancel">
       <p><strong>标题:</strong> <a-input v-model:value="currentTodo.title" /></p>
       <p><strong>到期时间:</strong>
         <!-- <a-input v-model:value="currentTodo.dueDate" /> -->
@@ -103,6 +141,25 @@ const renderedMarkdown = (markdown) => {
           <a-select-option value="低">低</a-select-option>
         </a-select>
       </p>
+      <p><strong>图片:</strong>
+        <div class="image-container">
+          <div class="image-wrapper" v-for="(img, index) in currentTodo.imgs" :key="index">
+            <img class="image-preview" :src="img" :key="img"/>
+            <delete-outlined class="delete-image" @click="removeImage(index)"/>
+          </div>
+        </div>
+        <a-upload
+          :disabled="currentTodo.imgs.length >= 3"
+          :before-upload="handleBeforeUpload"
+          :show-upload-list="false"
+          list-type="picture-card"
+          >
+          <div>
+            <plus-outlined />
+            <div style="margin-top: 8px">Upload</div>
+          </div>
+        </a-upload>
+      </p>
       <p><strong>备注:</strong>
         <!-- 一列md原文件，一列渲染后 -->
         <a-row :gutter="16">
@@ -115,6 +172,8 @@ const renderedMarkdown = (markdown) => {
         </a-row>
       </p>
     </a-modal>
+
+
   </div>
 </template>
 
@@ -158,5 +217,49 @@ const renderedMarkdown = (markdown) => {
   min-height: 200px;
   overflow: auto;
   background-color: #fafafa;
+}
+
+.image-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+/* 窄屏时每行1张图片 */
+@media (max-width: 999px) {
+  .image-wrapper {
+    flex: 0 0 100%;
+  }
+  .image-preview {
+    width: 20%;
+  }
+}
+
+/* 宽屏时每行显示3张图片 */
+@media (min-width: 1000px) {
+  .image-wrapper {
+    flex: 0 0 calc(20% - 8px);
+  }
+  .image-preview {
+    width: 100%;
+  }
+}
+
+.image-preview-card {
+  width: 33%;
+  object-fit: cover;
+  margin: 5px; /* 添加边距 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* 添加过渡效果 */
+}
+
+.image-preview:hover {
+  transform: scale(1.1); /* 悬浮时放大 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 悬浮时阴影效果 */
+}
+.delete-image {
+  width: 20px;
+}
+
+.modal {
+  width: 100%;
 }
 </style>
