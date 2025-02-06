@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 import {marked} from 'marked';
 import { message } from 'ant-design-vue';
+import TodoDetail from './TodoDetail.vue';
 
 const props = defineProps(['todos']);
 const emit = defineEmits(['update:todos']);
@@ -12,6 +13,15 @@ const emit = defineEmits(['update:todos']);
 const isModalVisible = ref(false);
 const currentTodo = ref();
 const modelTitle = ref('');
+const showTodoDetail = ref(false);
+const todoDetail = ref({});
+
+
+const handleClickTodo = (todo) => {
+  console.log('Click todo:', todo);
+  todoDetail.value = todo;
+  showTodoDetail.value = true;
+};
 
 const handleEditTodo = (todo) => {
   currentTodo.value = { ...todo };
@@ -101,7 +111,7 @@ const removeImage = (index) => {
     <a-row :gutter="16" justify="left">
       <a-col v-for="todo in props.todos" :key="todo.id"  class="card">
         <a-card :title="todo.title" hoverable >
-          <div class="card-content">
+          <div class="card-content" @click="handleClickTodo(todo)">
             <p><strong>到期时间:</strong> {{ dayjs(todo.dueDate).format("YYYY-MM-DD") }}</p>
             <p><strong>优先级:</strong> {{ todo.priority }}</p>
             <p v-if="todo.imgs"><strong>图片:</strong>
@@ -141,7 +151,7 @@ const removeImage = (index) => {
           <a-select-option value="低">低</a-select-option>
         </a-select>
       </p>
-      <p><strong>图片:</strong>
+      <div><strong>图片:</strong>
         <div class="image-container">
           <div class="image-wrapper" v-for="(img, index) in currentTodo.imgs" :key="index">
             <img class="image-preview" :src="img" :key="img"/>
@@ -159,7 +169,7 @@ const removeImage = (index) => {
             <div style="margin-top: 8px">Upload</div>
           </div>
         </a-upload>
-      </p>
+      </div>
       <p><strong>备注:</strong>
         <!-- 一列md原文件，一列渲染后 -->
         <a-row :gutter="16">
@@ -173,6 +183,7 @@ const removeImage = (index) => {
       </p>
     </a-modal>
 
+    <TodoDetail :todo="todoDetail" v-model:open="showTodoDetail"/>
 
   </div>
 </template>
