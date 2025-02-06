@@ -21,16 +21,10 @@ watch(todos, (newTodos) => {
   localStorage.setItem('todos', JSON.stringify(newTodos));
 }, { deep: true });
 
-const updateTodos = (updatedTodos) => {
-  console.log('Update todos:', updatedTodos);
-  todos.value = updatedTodos;
-  console.log('Current todos:', todos.value);
-};
-
 </script>
 
 <template>
-  <TodoList :todos="todos"  @update:todos="updateTodos" class="container"/>
+  <TodoList v-model:todos="todos"   class="container"/>
 </template>
 
 <style>

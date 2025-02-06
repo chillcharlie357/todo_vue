@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed} from 'vue';
 import { EditOutlined, DeleteOutlined , PlusOutlined} from '@ant-design/icons-vue';
 import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
@@ -16,6 +16,15 @@ const modelTitle = ref('');
 const showTodoDetail = ref(false);
 const todoDetail = ref({});
 
+// 将 props.todos 用 computed 包装，用于双向绑定
+const todosModel = computed({
+  get() {
+    return props.todos;
+  },
+  set(value) {
+    emit('update:todos', value);
+  }
+});
 
 const handleClickTodo = (todo) => {
   console.log('Click todo:', todo);
@@ -109,7 +118,7 @@ const removeImage = (index) => {
       </a-col>
     </a-row>
     <a-row :gutter="16" justify="left">
-      <a-col v-for="todo in props.todos" :key="todo.id"  class="card">
+      <a-col v-for="todo in todosModel" :key="todo.id"  class="card">
         <a-card :title="todo.title" hoverable >
           <div class="card-content" @click="handleClickTodo(todo)">
             <p><strong>到期时间:</strong> {{ dayjs(todo.dueDate).format("YYYY-MM-DD") }}</p>
