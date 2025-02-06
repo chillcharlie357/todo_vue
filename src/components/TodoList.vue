@@ -166,10 +166,10 @@ const removeImage = (index) => {
           <div class="card-content" @click="handleClickTodo(todo)">
             <p><strong>到期时间:</strong> {{ dayjs(todo.dueDate).format("YYYY-MM-DD") }}</p>
             <p><strong>优先级:</strong> {{ todo.priority }}</p>
-            <p v-if="todo.imgs"><strong>图片:</strong>
+            <p v-if="todo.imgs && todo.imgs.length > 0"><strong>图片:</strong>
               <img class="image-preview-card" v-for="img in todo.imgs" :src="img" :key="img"/>
             </p>
-            <p v-if="todo.remark"><strong>备注:</strong> </p>
+            <p v-if="todo.remark && todo.remark !== ''"><strong>备注:</strong> </p>
             <div v-html="renderedMarkdown(todo.remark)"></div>
           </div>
 
