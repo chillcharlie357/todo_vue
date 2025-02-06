@@ -31,7 +31,7 @@ const renderedMarkdown = (markdown) => {
       {{ dayjs(props.todo.dueDate).format("YYYY-MM-DD") }}
     </p>
     <p><strong>优先级:</strong> {{ props.todo.priority }}</p>
-    <p v-if="props.todo.imgs">
+    <p v-if="props.todo.imgs && props.todo.imgs.length > 0">
       <strong>图片:</strong>
       <img
         class="image-preview-card"
@@ -40,7 +40,7 @@ const renderedMarkdown = (markdown) => {
         :key="img"
       />
     </p>
-    <p v-if="props.todo.remark"><strong>备注:</strong></p>
+    <p v-if="props.todo.remark && props.todo.remark !== ''"><strong>备注:</strong></p>
     <div v-html="renderedMarkdown(props.todo.remark)"></div>
   </a-modal>
 </template>
