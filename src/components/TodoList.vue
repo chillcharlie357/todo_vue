@@ -149,7 +149,7 @@ const removeImage = (index) => {
           </div>
         </div>
         <a-upload
-          :disabled="currentTodo.imgs.length >= 3"
+          :disabled="currentTodo && currentTodo.imgs &&currentTodo.imgs.length >= 3"
           :before-upload="handleBeforeUpload"
           :show-upload-list="false"
           list-type="picture-card"
