@@ -41,7 +41,7 @@ const renderedMarkdown = (markdown) => {
       />
     </p>
     <p v-if="props.todo.remark && props.todo.remark !== ''"><strong>备注:</strong></p>
-    <div v-html="renderedMarkdown(props.todo.remark)"></div>
+    <div class="markdown-preview" v-html="renderedMarkdown(props.todo.remark)"></div>
   </a-modal>
 </template>
 
@@ -56,4 +56,14 @@ const renderedMarkdown = (markdown) => {
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
+.markdown-preview {
+  border: 1px solid #d9d9d9;
+  padding: 8px;
+  min-height: 200px;
+  overflow: auto;
+  background-color: #fafafa;
+}
+
 </style>
+
+
