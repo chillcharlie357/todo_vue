@@ -26,6 +26,27 @@ const todosModel = computed({
   }
 });
 
+// 添加筛选状态：完成状态和优先级
+const filterCompletion = ref('全部'); // 选项：全部、已完成、未完成
+const filterPriority = ref('全部');     // 选项：全部、高、中、低
+
+// 计算筛选后的待办事项列表
+const filteredTodos = computed(() => {
+  return todosModel.value.filter(todo => {
+    let matchCompletion = true;
+    if (filterCompletion.value === '已完成') {
+      matchCompletion = todo.finished;
+    } else if (filterCompletion.value === '未完成') {
+      matchCompletion = !todo.finished;
+    }
+    let matchPriority = true;
+    if (filterPriority.value !== '全部') {
+      matchPriority = todo.priority === filterPriority.value;
+    }
+    return matchCompletion && matchPriority;
+  });
+});
+
 const handleClickTodo = (todo) => {
   console.log('Click todo:', todo);
   todoDetail.value = todo;
@@ -66,6 +87,8 @@ const handleAddTodo = () => {
     dueDate: dayjs(),
     priority: '中',
     remark: '',
+    imgs: [],
+    finished: false
   }
   modelTitle.value = '添加待办事项';
   isModalVisible.value = true;
@@ -117,8 +140,28 @@ const removeImage = (index) => {
         <a-button type="primary" @click="handleAddTodo">添加待办事项</a-button>
       </a-col>
     </a-row>
+
+    <!-- 筛选控件 -->
+    <a-row :gutter="16" justify="start" style="margin-bottom: 16px;">
+      <a-col>
+        <a-select v-model:value="filterCompletion" placeholder="筛选完成状态" style="width: 150px;">
+          <a-select-option value="全部">全部</a-select-option>
+          <a-select-option value="已完成">已完成</a-select-option>
+          <a-select-option value="未完成">未完成</a-select-option>
+        </a-select>
+      </a-col>
+      <a-col>
+        <a-select v-model:value="filterPriority" placeholder="筛选优先级" style="width: 150px;">
+          <a-select-option value="全部">全部</a-select-option>
+          <a-select-option value="高">高</a-select-option>
+          <a-select-option value="中">中</a-select-option>
+          <a-select-option value="低">低</a-select-option>
+        </a-select>
+      </a-col>
+    </a-row>
+
     <a-row :gutter="16" justify="left">
-      <a-col v-for="todo in todosModel" :key="todo.id"  class="card">
+      <a-col v-for="todo in filteredTodos" :key="todo.id" class="card">
         <a-card :title="todo.title" hoverable >
           <div class="card-content" @click="handleClickTodo(todo)">
             <p><strong>到期时间:</strong> {{ dayjs(todo.dueDate).format("YYYY-MM-DD") }}</p>
@@ -133,7 +176,7 @@ const removeImage = (index) => {
           <template #actions>
             <edit-outlined key="edit" @click="handleEditTodo(todo)" />
             <delete-outlined key="delete" @click="handleDeleteTodo(todo)"/>
-            <a-checkbox key="finish" v-model:checked="todo.finished">Finished</a-checkbox>
+            <a-checkbox key="finish" v-model:checked="todo.finished">完成</a-checkbox>
           </template>
         </a-card>
       </a-col>
