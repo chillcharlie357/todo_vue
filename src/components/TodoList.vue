@@ -66,12 +66,12 @@ const renderedMarkdown = (markdown) => {
 <template>
   <div style="background-color: #ececec; padding: 20px">
     <a-row :gutter="16" justify="center">
-      <a-col :span="24" justify="center">
+      <a-col class="head"  justify="center">
         <a-button type="primary" @click="handleAddTodo">添加待办事项</a-button>
       </a-col>
     </a-row>
     <a-row :gutter="16" justify="left">
-      <a-col v-for="todo in props.todos" :key="todo.id" :span="8" style="margin-top: 20px">
+      <a-col v-for="todo in props.todos" :key="todo.id"  class="card">
         <a-card :title="todo.title" hoverable >
           <div class="card-content">
             <p><strong>到期时间:</strong> {{ dayjs(todo.dueDate).format("YYYY-MM-DD") }}</p>
@@ -120,6 +120,26 @@ const renderedMarkdown = (markdown) => {
 
 
 <style scoped>
+/* 默认显示1列 */
+.card {
+  margin-top: 20px;
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+/* 宽屏显示3列 */
+@media (min-width: 1000px) {
+  .card {
+    flex: 0 0 33%;
+    max-width: 33%;
+  }
+}
+
+.head {
+  flex: 0 0 100%;
+  max-width: 100%;
+  margin-bottom: 16px;
+}
+
 .card-content {
   min-height: 160px;
   max-height: 160px;
