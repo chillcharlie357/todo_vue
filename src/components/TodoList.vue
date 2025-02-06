@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons-vue';
 import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
+import {marked} from 'marked';
 
 const props = defineProps(['todos']);
 const emit = defineEmits(['update:todos']);
@@ -56,6 +57,10 @@ const handleDeleteTodo = (todo) => {
   emit('update:todos', updatedTodos);
 };
 
+const renderedMarkdown = (markdown) => {
+  return marked(markdown || '');
+};
+
 </script>
 
 <template>
@@ -67,10 +72,14 @@ const handleDeleteTodo = (todo) => {
     </a-row>
     <a-row :gutter="16" justify="left">
       <a-col v-for="todo in props.todos" :key="todo.id" :span="8" style="margin-top: 20px">
-        <a-card :title="todo.title" hoverable>
-          <p><strong>到期时间:</strong> {{ dayjs(todo.dueDate).format("YYYY-MM-DD") }}</p>
-          <p><strong>优先级:</strong> {{ todo.priority }}</p>
-          <p><strong>备注:</strong> {{ todo.remark }}</p>
+        <a-card :title="todo.title" hoverable >
+          <div class="card-content">
+            <p><strong>到期时间:</strong> {{ dayjs(todo.dueDate).format("YYYY-MM-DD") }}</p>
+            <p><strong>优先级:</strong> {{ todo.priority }}</p>
+            <p><strong>备注:</strong> </p>
+            <div v-html="renderedMarkdown(todo.remark)"></div>
+          </div>
+
           <template #actions>
             <edit-outlined key="edit" @click="handleEditTodo(todo)" />
             <delete-outlined key="delete" @click="handleDeleteTodo(todo)"/>
@@ -94,8 +103,40 @@ const handleDeleteTodo = (todo) => {
           <a-select-option value="低">低</a-select-option>
         </a-select>
       </p>
-      <p><strong>备注:</strong> <a-input v-model:value="currentTodo.remark" /></p>
+      <p><strong>备注:</strong>
+        <!-- 一列md原文件，一列渲染后 -->
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-textarea class="markdown-edit" v-model:value="currentTodo.remark" />
+          </a-col>
+          <a-col :span="12">
+            <div class="markdown-preview" v-html="marked(currentTodo.remark)"></div>
+          </a-col>
+        </a-row>
+      </p>
     </a-modal>
   </div>
 </template>
 
+
+<style scoped>
+.card-content {
+  min-height: 160px;
+  max-height: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.markdown-edit {
+  border: 1px solid #d9d9d9;
+  padding: 8px;
+  min-height: 200px;
+  overflow: auto;
+}
+.markdown-preview {
+  border: 1px solid #d9d9d9;
+  padding: 8px;
+  min-height: 200px;
+  overflow: auto;
+  background-color: #fafafa;
+}
+</style>

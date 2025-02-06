@@ -13,6 +13,7 @@
   "dependencies": {
     "ant-design-vue": "^4.2.6",
     "dayjs": "^1.11.13",
+    "marked": "^15.0.6",
     "pinia": "^2.3.1",
     "todo": "file:",
     "uuid": "^11.0.5",
